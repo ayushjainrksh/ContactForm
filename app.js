@@ -1,8 +1,9 @@
 var express = require('express'),
     app = express();
 
+app.set("view engine" , "ejs");
 app.get('/', function(req, res){
-    res.send("Hello...");
+    res.render('contact.ejs');
 });
 
 
