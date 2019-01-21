@@ -1,7 +1,12 @@
+require('dotenv').config()
+
 var express = require('express'),
     bodyParser = require('body-parser'),
     nodemailer = require('nodemailer');
     app = express();
+
+USER = process.env.GMAIL_USER;
+PASS = process.env.GMAIL_PASS;
 
 app.set("view engine" , "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
@@ -10,28 +15,30 @@ app.get('/', function(req, res){
     res.render('contact.ejs');
 });
 
-app.post('contact', function(req, res){
+app.post('/contact', function(req, res){
     let mailOpts, smtpTrans;
     smtpTrans = nodemailer.createTransport({
         host: 'smtp.gmail.com',
         port: 465,
         secure: true,
         auth: {
-            user: GMAIL_USER,
-            pass: GMAIL_PASS
+            user: USER,
+            pass: PASS
         }
     });
     mailOpts = {
         from: req.body.name + ' &lt;' + req.body.email + '&gt;',
-        to: GMAIL_USER,
+        to: USER,
         subject: 'New message',
-        text: '${req.body.name} (${req.body.email}) says: ${req.body.message}'
+        text: 'Sent by : ' + req.body.name + ' Email : ' + req.body.email + ' Message : ' + req.body.message
     };
-    smtpTrans.sendMail(mailOpts, function(err, res){
-        if(err)
+    smtpTrans.sendMail(mailOpts, function(err){
+        if(err){
             console.log(err);
+            res.send('Failed to send the message');
+        }
         else
-            res.send("Message sent");
+            res.render("contact-success.ejs");
     });
 });
 
